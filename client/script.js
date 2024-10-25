@@ -1,4 +1,4 @@
-const socket = io("https://group-video-call-wy0k.onrender.com");
+const socket = new WebSocket("https://group-video-call-wy0k.onrender.com");
 const myVideoContainer = document.getElementById('myVideoContainer');
 const otherVideosContainer = document.getElementById('otherVideosContainer');
 const startCallButton = document.getElementById('startCall');
