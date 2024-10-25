@@ -1,31 +1,28 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ server });
 
-app.use(express.static(path.join(__dirname, '../client'))); // Serve static files from the client directory
+app.use(express.static('public'));
 
-io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+wss.on('connection', (ws) => {
+    console.log('A user connected');
 
-    socket.on('join-room', (roomId) => {
-        socket.join(roomId);
-        socket.to(roomId).emit('user-connected', socket.id);
-        console.log(`User ${socket.id} joined room: ${roomId}`);
-
-        socket.on('disconnect', () => {
-            socket.to(roomId).emit('user-disconnected', socket.id);
-            console.log(`User ${socket.id} disconnected`);
+    ws.on('message', (message) => {
+        console.log(`Received: ${message}`);
+        // Broadcast to other clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
         });
     });
 
-    socket.on('send-signal', (signal, targetId) => {
-        socket.to(targetId).emit('receive-signal', signal, socket.id);
-        console.log(`Signal sent from ${socket.id} to ${targetId}`);
+    ws.on('close', () => {
+        console.log('A user disconnected');
     });
 });
 
