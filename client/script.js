@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io("https://group-video-call-3cwr.vercel.app");
 const myVideoContainer = document.getElementById('myVideoContainer');
 const otherVideosContainer = document.getElementById('otherVideosContainer');
 const startCallButton = document.getElementById('startCall');
